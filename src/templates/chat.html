@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <div id="messages"></div>
+
+    <form>
+      <input type="text" name="chat-box" placeholder="Enter your message here">
+      <button type="submit">SEND</button>
+    </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
+      const socket = io();
+      socket.on('connect', () => {
+        socket.emit('joined_room', '{{ username }}');
+      });
+
+      socket.on("joined_announcement", (username) => {
+        const messages = document.getElementById("messages");
+        const newMessage = document.createElement('div');
+        newMessage.innerHTML = `<strong>${username}</strong> joined the chat`;
+        messages.appendChild(newMessage);
+      });
+
+      const chatbox = document.querySelector('input');
+      document.querySelector('form').onsubmit = (e) => {
+        e.preventDefault();
+        let message = chatbox.value.trim();
+        if (message.length) {
+          let data = {
+            username: "{{ username }}",
+            message: message
+          };
+          socket.emit('new_message', data);
+        }
+        chatbox.value = "";
+        chatbox.focus();
+      }
+
+      socket.on("broadcast_message", (data) => {
+        const messages = document.getElementById("messages");
+        const newMessage = document.createElement('div');
+        console.log(data);
+        newMessage.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
+        messages.appendChild(newMessage);
+      })
+    </script>
+  </body>
+</html>
