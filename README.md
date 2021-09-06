@@ -1,4 +1,4 @@
-> Simples Chat App using flask and flasksocketio
+> Simplest Chat App using flask and flasksocketio
 
 # Setup
 1. Install dependencies
