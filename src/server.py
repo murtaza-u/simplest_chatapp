@@ -22,5 +22,9 @@ def handle_new_connection(username):
 def handle_new_message(data):
     emit('broadcast_message', data, broadcast=True)
 
+@socketio.on('file')
+def broadcast_file(data):
+    emit('file_received', data, broadcast=True, include_self=False)
+
 if __name__ == "__main__":
     socketio.run(app)

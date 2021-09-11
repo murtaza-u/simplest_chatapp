@@ -9,22 +9,17 @@
     <div id="messages"></div>
 
     <form>
-      <input type="text" name="chat-box" placeholder="Enter your message here">
-      <button type="submit">SEND</button>
+      <input id="chat-input" type="text" name="chat-box" placeholder="Enter your message here">
+      <input id="file-input" type="file" name="name" style="display: none;" />
+      <button id="btn-send" type="submit">SEND</button>
+      <button id="btn-open">Open</button>
     </form>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-    <script type="text/javascript" charset="utf-8">
+    <script>
       const socket = io();
       socket.on('connect', () => {
         socket.emit('joined_room', '{{ username }}');
-      });
-
-      socket.on("joined_announcement", (username) => {
-        const messages = document.getElementById("messages");
-        const newMessage = document.createElement('div');
-        newMessage.innerHTML = `<strong>${username}</strong> joined the chat`;
-        messages.appendChild(newMessage);
       });
 
       const chatbox = document.querySelector('input');
@@ -41,14 +36,7 @@
         chatbox.value = "";
         chatbox.focus();
       }
-
-      socket.on("broadcast_message", (data) => {
-        const messages = document.getElementById("messages");
-        const newMessage = document.createElement('div');
-        console.log(data);
-        newMessage.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
-        messages.appendChild(newMessage);
-      })
     </script>
+    <script src="{{ url_for("static", filename="chat.js") }}" type="text/javascript" charset="utf-8"></script>
   </body>
 </html>
