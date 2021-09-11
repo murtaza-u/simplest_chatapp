@@ -1,8 +1,30 @@
+const username = document.querySelector("h1").innerHTML;
+
+const socket = io();
+socket.on('connect', () => {
+  socket.emit('joined_room', username);
+});
+
 const addToBox = msg => {
   const messages = document.getElementById("messages");
   const newMessage = document.createElement('div');
   newMessage.innerHTML = msg;
   messages.appendChild(newMessage);
+}
+
+const chatbox = document.querySelector('input');
+document.querySelector('form').onsubmit = (e) => {
+  e.preventDefault();
+  let message = chatbox.value.trim();
+  if (message.length) {
+    let data = {
+      username: username,
+      message: message
+    };
+    socket.emit('new_message', data);
+  }
+  chatbox.value = "";
+  chatbox.focus();
 }
 
 socket.on("joined_announcement", (username) => {
@@ -26,4 +48,26 @@ socket.on("file_received", (data) => {
     download(data.content, data.name, data.type);
   }
   addToBox(`<strong>${data.username}</strong>: Attachment`);
+})
+
+const file_input = document.getElementById("file-input")
+file_input.onchange = e => {
+  let file = e.target.files[0];
+
+  let reader = new FileReader();
+  reader.readAsArrayBuffer(file);
+  reader.onload = readerEvent => {
+    let data = {
+      content: readerEvent.target.result,
+      name: file.name,
+      type: file.type,
+      username: username,
+    }
+    socket.emit("file", data);
+    addToBox("sending file.....");
+  }
+}
+
+document.getElementById("btn-open").addEventListener("click", () => {
+  file_input.click();
 })
