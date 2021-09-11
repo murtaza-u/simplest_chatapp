@@ -27,4 +27,4 @@ def broadcast_file(data):
     emit('file_received', data, broadcast=True, include_self=False)
 
 if __name__ == "__main__":
-    socketio.run(app)
+    socketio.run(app, host="0.0.0.0")

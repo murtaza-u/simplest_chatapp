@@ -1,16 +1,16 @@
-socket.on("joined_announcement", (username) => {
+const addToBox = msg => {
   const messages = document.getElementById("messages");
   const newMessage = document.createElement('div');
-  newMessage.innerHTML = `<strong>${username}</strong> joined the chat`;
+  newMessage.innerHTML = msg;
   messages.appendChild(newMessage);
+}
+
+socket.on("joined_announcement", (username) => {
+  addToBox(`<strong>${username}</strong> joined the chat`);
 });
 
 socket.on("broadcast_message", (data) => {
-  const messages = document.getElementById("messages");
-  const newMessage = document.createElement('div');
-  console.log(data);
-  newMessage.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
-  messages.appendChild(newMessage);
+  addToBox(`<strong>${data.username}:</strong> ${data.message}`);
 })
 
 const download = (content, name, type) => {
@@ -22,25 +22,8 @@ const download = (content, name, type) => {
 }
 
 socket.on("file_received", (data) => {
-  download(data.content, data.name, data.type);
-})
-
-const file_input = document.getElementById("file-input")
-file_input.onchange = e => {
-  let file = e.target.files[0];
-
-  let reader = new FileReader();
-  reader.readAsArrayBuffer(file);
-  reader.onload = readerEvent => {
-    let data = {
-      content: readerEvent.target.result,
-      name: file.name,
-      type: file.type,
-    }
-    socket.emit("file", data);
+  if (confirm(`Do you want to download attachment from ${data.username}?`)) {
+    download(data.content, data.name, data.type);
   }
-}
-
-document.getElementById("btn-open").addEventListener("click", () => {
-  file_input.click();
+  addToBox(`<strong>${data.username}</strong>: Attachment`);
 })

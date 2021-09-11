@@ -36,6 +36,28 @@
         chatbox.value = "";
         chatbox.focus();
       }
+
+      const file_input = document.getElementById("file-input")
+      file_input.onchange = e => {
+        let file = e.target.files[0];
+
+        let reader = new FileReader();
+        reader.readAsArrayBuffer(file);
+        reader.onload = readerEvent => {
+          let data = {
+            content: readerEvent.target.result,
+            name: file.name,
+            type: file.type,
+            username: "{{ username }}",
+          }
+          socket.emit("file", data);
+          addToBox("sending file.....");
+        }
+      }
+
+      document.getElementById("btn-open").addEventListener("click", () => {
+        file_input.click();
+      })
     </script>
     <script src="{{ url_for("static", filename="chat.js") }}" type="text/javascript" charset="utf-8"></script>
   </body>
